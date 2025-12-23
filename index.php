@@ -1,5 +1,4 @@
 <?php require_once __DIR__ . "/_track.php"; ?>
-<?php require_once __DIR__ . "/_track.php"; ?>
 <?php
 // --- index.php ---
 
@@ -102,11 +101,8 @@ if (!in_array($page_identifier, $valid_page_identifiers)) {
     exit;
 }
 
-// If we've reached here, $current_lang is set and $page_identifier is considered valid (e.g., empty for main lang page)
-
 // --- Load Language File ---
 $lang_file = __DIR__ . '/lang_' . $current_lang . '.json';
-// ... (rest of your language loading logic, unchanged)
 $translations = [];
 if (file_exists($lang_file)) {
     $translations_json = file_get_contents($lang_file);
@@ -155,7 +151,9 @@ function t($key) {
                 }
             }
         }
-        error_log("Missing translation key '{$key}' for language '{$current_lang}' (and default).");
+        // Instead of error_log, we can return the key itself if it looks like human readable text,
+        // but typically keys are camelCase. For this added DB section, we will put content directly in HTML.
+        // error_log("Missing translation key '{$key}' for language '{$current_lang}' (and default).");
         return htmlspecialchars((string)$key, ENT_QUOTES, 'UTF-8');
     }
 }
@@ -243,10 +241,11 @@ if ($pdo) {
     <link rel="alternate" hreflang="x-default" href="https://www.sortia.ai<?= htmlspecialchars($en_url, ENT_QUOTES, 'UTF-8') ?>" />
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" xintegrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Added Orbitron font for wider look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <style>
         html { scroll-padding-top: 3.5rem; scroll-behavior: smooth; }
         body { font-family: 'Inter', sans-serif; background-color: #111827; color: #f3f4f6; overflow-x: hidden; }
@@ -312,16 +311,17 @@ if ($pdo) {
     <header class="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 shadow-md">
         <nav class="container mx-auto px-4 sm:px-6 py-2 flex justify-between items-center">
             <a href="<?= htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8') ?>" class="block hover:opacity-80 transition duration-300 logo-link">
-                <img src="/images/logos/sortia_logo.png"
-                     alt="sortia Logo"
-                     class="h-8 md:h-10 w-auto"
-                     onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'text-3xl sm:text-4xl font-bold text-blue-400\'>Sortia</span>';">
-                     </a>
+                <!-- LOGO FIX: Text-based logo to ensure visibility and boldness -->
+                <span style="font-family: 'Orbitron', sans-serif;" class="text-3xl md:text-4xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-400 drop-shadow-sm">Sortia</span>
+             </a>
             <div class="hidden md:flex items-center space-x-4 lg:space-x-6">
-            <a href="#solutions" class="text-gray-300 hover:text-white transition duration-300 text-sm lg:text-base"><?= t('navSolutions') ?></a>
-                <a href="#services" class="text-gray-300 hover:text-white transition duration-300 text-sm lg:text-base"><?= t('navServices') ?></a>
-                <a href="#references" class="text-gray-300 hover:text-white transition duration-300 text-sm lg:text-base"><?= t('navReferences') ?></a>
-                <a href="#get-started" class="bg-[#013A63] hover:bg-blue-600 text-white font-semibold px-4 py-[3px] lg:px-5 lg:py-[3px] rounded-lg transition duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm lg:text-base"><?= t('navContact') ?></a>
+                <!-- Nav Links with basic styling; JS will toggle active class -->
+                <a href="#db-clusters" class="nav-link text-gray-300 hover:text-white transition duration-300 text-sm lg:text-base">DB Clusters</a>
+                <a href="#solutions" class="nav-link text-gray-300 hover:text-white transition duration-300 text-sm lg:text-base"><?= t('navSolutions') ?></a>
+                <a href="#services" class="nav-link text-gray-300 hover:text-white transition duration-300 text-sm lg:text-base"><?= t('navServices') ?></a>
+                <a href="#references" class="nav-link text-gray-300 hover:text-white transition duration-300 text-sm lg:text-base"><?= t('navReferences') ?></a>
+                <a href="#get-started" class="nav-link bg-[#013A63] hover:bg-blue-600 text-white font-semibold px-4 py-[3px] lg:px-5 lg:py-[3px] rounded-lg transition duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm lg:text-base"><?= t('navContact') ?></a>
+                
                 <div class="lang-switch flex items-center text-gray-300 border-l border-gray-600 ml-4 pl-4">
                     <a href="<?= htmlspecialchars($en_url, ENT_QUOTES, 'UTF-8') ?>" id="lang-en-desktop" class="<?= ($current_lang === 'en' ? 'active' : '') ?>">EN</a>
                     <span class="mx-1">|</span>
@@ -345,6 +345,100 @@ if ($pdo) {
         </div>
     </header>
 
+    <!-- START OF NEW TOP DATABASE SECTION -->
+    <section id="db-clusters" class="relative bg-[#0B1120] text-white pt-16 pb-20 overflow-hidden border-b border-gray-800">
+        <!-- Decorative Glows -->
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-600/5 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2"></div>
+
+        <div class="container mx-auto px-4 sm:px-6 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+                
+                <!-- Left Text Content -->
+                <div class="lg:w-1/2 text-center lg:text-left fade-in-element">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-900/30 border border-blue-500/30 text-blue-400 text-sm font-medium mb-6">
+                        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.5)]"></span>
+                        <?= t('dbHeroBadge') ?>
+                    </div>
+                    
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-[1.15] text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300">
+                        <?= t('dbHeroHeadline') ?>
+                    </h1>
+                    
+                    <p class="text-gray-400 text-lg md:text-xl mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                        We design and manage self-healing MySQL (Galera, Percona, MariaDB), PostgreSQL, MongoDB, <strong>MSSQL, Oracle, and DB2</strong> architectures. 
+                        Ensure your data is consistent, secure, and always available—even during high traffic spikes.
+                        <br><span class="text-sm text-gray-500 mt-2 inline-block"><?= t('dbHeroLocation') ?></span>
+                    </p>
+
+                    <!-- Feature Tags -->
+                    <div class="flex flex-wrap justify-center lg:justify-start gap-3 mb-8 text-sm font-medium text-gray-300">
+                        <span class="px-3 py-1 rounded bg-gray-800 border border-gray-700"><?= t('dbTagTuning') ?></span>
+                        <span class="px-3 py-1 rounded bg-gray-800 border border-gray-700"><?= t('dbTagMigration') ?></span>
+                        <span class="px-3 py-1 rounded bg-gray-800 border border-gray-700"><?= t('dbTagDR') ?></span>
+                        <span class="px-3 py-1 rounded bg-gray-800 border border-gray-700"><?= t('dbTagScaling') ?></span>
+                    </div>
+
+                    <!-- Tech Stack Icons Mini -->
+                    <div class="flex flex-wrap justify-center lg:justify-start gap-3 lg:gap-4 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+                        <div class="flex items-center gap-2" title="MySQL / MariaDB"><i class="fas fa-database text-blue-400 text-2xl"></i> <span class="text-sm font-semibold">MySQL</span></div>
+                        <div class="flex items-center gap-2" title="PostgreSQL"><i class="fas fa-database text-cyan-400 text-2xl"></i> <span class="text-sm font-semibold">PostgreSQL</span></div>
+                        <div class="flex items-center gap-2" title="MongoDB"><i class="fas fa-leaf text-green-400 text-2xl"></i> <span class="text-sm font-semibold">MongoDB</span></div>
+                        <div class="flex items-center gap-2" title="Redis"><i class="fas fa-layer-group text-red-400 text-2xl"></i> <span class="text-sm font-semibold">Redis</span></div>
+                        
+                        <!-- ADDED ENTERPRISE DATABASES -->
+                        <div class="flex items-center gap-2" title="Microsoft SQL Server"><i class="fas fa-server text-red-500 text-2xl"></i> <span class="text-sm font-semibold">MSSQL</span></div>
+                        <div class="flex items-center gap-2" title="Oracle Database"><i class="fas fa-database text-red-700 text-2xl"></i> <span class="text-sm font-semibold">Oracle</span></div>
+                        <div class="flex items-center gap-2" title="IBM DB2"><i class="fas fa-hdd text-blue-600 text-2xl"></i> <span class="text-sm font-semibold">DB2</span></div>
+                    </div>
+                </div>
+                
+                <!-- Right Visual (Abstract Cluster Diagram) -->
+                <div class="lg:w-1/2 w-full fade-in-element" style="animation-delay: 0.2s;">
+                    <!-- ENLARGED IMAGE CONTAINER: Increased max-w and removed restrictive aspect ratio for large screens -->
+                    <div class="relative w-full max-w-2xl mx-auto aspect-square lg:aspect-auto lg:h-[400px] flex items-center justify-center">
+                        
+                        <!-- Background Grid -->
+                        <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:30px_30px] rounded-xl border border-gray-700/50"></div>
+
+                        <!-- Central Node (Primary) -->
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gray-800 border-2 border-blue-500 rounded-xl flex flex-col items-center justify-center shadow-[0_0_30px_rgba(59,130,246,0.2)] z-20">
+                            <i class="fas fa-server text-blue-400 text-3xl mb-1"></i>
+                            <span class="text-[10px] uppercase font-bold text-blue-300">Primary</span>
+                            <span class="text-[9px] text-green-400">● Active</span>
+                        </div>
+
+                        <!-- Node 2 (Replica Left) -->
+                        <div class="absolute top-1/2 left-[15%] -translate-y-1/2 w-20 h-20 bg-gray-800 border border-gray-600 rounded-lg flex flex-col items-center justify-center opacity-80 z-10">
+                            <i class="fas fa-database text-gray-400 text-2xl mb-1"></i>
+                            <span class="text-[10px] font-mono text-gray-400">Replica 1</span>
+                        </div>
+
+                        <!-- Node 3 (Replica Right) -->
+                        <div class="absolute top-1/2 right-[15%] -translate-y-1/2 w-20 h-20 bg-gray-800 border border-gray-600 rounded-lg flex flex-col items-center justify-center opacity-80 z-10">
+                            <i class="fas fa-database text-gray-400 text-2xl mb-1"></i>
+                            <span class="text-[10px] font-mono text-gray-400">Replica 2</span>
+                        </div>
+
+                        <!-- Connecting Lines (CSS) -->
+                        <div class="absolute top-1/2 left-[28%] right-[28%] h-[2px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent -translate-y-1/2 z-0"></div>
+                        
+                        <!-- Animated Data Particles -->
+                        <div class="absolute top-1/2 left-[35%] w-2 h-2 bg-blue-400 rounded-full animate-[ping_1.5s_linear_infinite]"></div>
+                        <div class="absolute top-1/2 right-[35%] w-2 h-2 bg-blue-400 rounded-full animate-[ping_1.5s_linear_1s_infinite]"></div>
+
+                        <!-- Floating Badge -->
+                        <div class="absolute -bottom-6 bg-gray-900 border border-gray-700 px-4 py-2 rounded-full shadow-xl flex items-center gap-3">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span class="text-xs font-mono text-gray-300">Sync_Latency: <span class="text-green-400">0.4ms</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- END OF NEW TOP DATABASE SECTION -->
+
     <section class="relative bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900/50 text-white px-4 sm:px-6 pt-12 md:pt-20 lg:pt-24 pb-6 md:pb-10 lg:pb-12 overflow-hidden">
         <div class="absolute inset-0 opacity-10">
              <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="dotted-pattern" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.5)"/></pattern></defs><rect width="100%" height="100%" fill="url(#dotted-pattern)"/></svg>
@@ -354,8 +448,9 @@ if ($pdo) {
         <div class="absolute bottom-1/4 left-1/3 w-48 h-48 md:w-72 md:h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
 
         <div class="container mx-auto text-center relative z-10">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight fade-in-element" style="animation-delay: 0.1s;">
-                <?= t('heroHeadline') ?> <span class="text-blue-400"><?= t('heroHeadlineSpan') ?></span>
+            <!-- Adjusted H1 size and added gradient for colorful effect -->
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 leading-tight fade-in-element text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300" style="animation-delay: 0.1s;">
+                <?= t('heroHeadline') ?> <?= t('heroHeadlineSpan') ?>
             </h1>
             <p class="text-base sm:text-lg md:text-xl text-gray-300 mb-6 md:mb-8 max-w-3xl mx-auto fade-in-element" style="animation-delay: 0.3s;">
                 <?= t('heroSubheadline') ?>
@@ -407,7 +502,7 @@ if ($pdo) {
     <section id="flexibility" class="bg-gradient-to-b from-gray-800 to-gray-900 px-4 sm:px-6 pt-8 md:pt-10 lg:pt-12 pb-12 md:pb-16 lg:pb-20">
         <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
             <div class="fade-in-element text-center md:text-left">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-5 text-blue-300"><?= t('flexibilityTitle') ?></h2>
+                <h2 class="text-3xl md:text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300"><?= t('flexibilityTitle') ?></h2>
                 <p class="text-lg text-gray-300 mb-6 leading-relaxed">
                     <?= t('flexibilityDesc') ?>
                 </p>
@@ -432,7 +527,7 @@ if ($pdo) {
 
     <section id="learn-more" class="pb-10 md:pb-14 lg:pb-16 bg-gray-900 px-4 sm:px-6">
         <div class="container mx-auto text-center">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-blue-300 fade-in-element"> <?= t('actionAITitle') ?> </h2>
+            <h2 class="text-3xl md:text-5xl font-bold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 fade-in-element"> <?= t('actionAITitle') ?> </h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                 <div class="flex flex-col items-center p-4 md:p-6 bg-gray-800 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 fade-in-element" style="animation-delay: 0.1s;"> <div class="text-4xl md:text-5xl text-blue-400 mb-3 md:mb-4"><i class="fas fa-rocket"></i></div> <h3 class="text-xl md:text-2xl font-semibold mb-2"><?= t('actionAICardActionTitle') ?></h3> <p class="text-sm md:text-base text-gray-400"><?= t('actionAICardActionDesc') ?></p> </div>
                  <div class="flex flex-col items-center p-4 md:p-6 bg-gray-800 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 fade-in-element" style="animation-delay: 0.2s;"> <div class="text-4xl md:text-5xl text-purple-400 mb-3 md:mb-4"><i class="fas fa-brain"></i></div> <h3 class="text-xl md:text-2xl font-semibold mb-2"><?= t('actionAICardAITitle') ?></h3> <p class="text-sm md:text-base text-gray-400"><?= t('actionAICardAIDesc') ?></p> </div>
@@ -444,7 +539,7 @@ if ($pdo) {
 
     <section id="solutions" class="py-10 md:py-14 lg:py-16 bg-gray-900 px-4 sm:px-6">
         <div class="container mx-auto">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12 text-blue-400 fade-in-element"><?= t('problemsTitle') ?></h2>
+            <h2 class="text-3xl md:text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 fade-in-element"><?= t('problemsTitle') ?></h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                 <div class="problem-card bg-gray-800 p-5 md:p-6 rounded-lg shadow-lg border-l-4 border-blue-500 fade-in-element"> <h3 class="text-lg md:text-xl font-semibold mb-2 md:mb-3 text-white"><?= t('problem1Title') ?></h3> <p class="text-sm md:text-base text-gray-400"><?= t('problem1Desc') ?></p> </div>
                  <div class="problem-card bg-gray-800 p-5 md:p-6 rounded-lg shadow-lg border-l-4 border-purple-500 fade-in-element"> <h3 class="text-lg md:text-xl font-semibold mb-2 md:mb-3 text-white"><?= t('problem2Title') ?></h3> <p class="text-sm md:text-base text-gray-400"><?= t('problem2Desc') ?></p> </div>
@@ -454,9 +549,9 @@ if ($pdo) {
         </div>
     </section>
 
-    <section id="services" class="py-10 md:py-14 lg:py-16 bg-gray-800 px-4 sm:px-6 fade-in-element">
+    <section id="services" class="py-10 md:py-14 lg:py-16 bg-gray-900 px-4 sm:px-6 fade-in-element">
         <div class="container mx-auto">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-12 text-blue-300"><?= t('techTitle') ?></h2>
+            <h2 class="text-3xl md:text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300"><?= t('techTitle') ?></h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div class="tech-category"> <h3 class="text-xl font-semibold mb-4 flex items-center"><i class="fas fa-cloud mr-3 text-sky-400"></i><?= t('techCatCloud') ?></h3> <ul class="space-y-3 text-sm md:text-base"> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>AWS:</strong> <?= t('techAWS') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>Azure:</strong> <?= t('techAzure') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>GCP:</strong> <?= t('techGCP') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>EC2:</strong> <?= t('techEC2') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>S3:</strong> <?= t('techS3') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>Lambda:</strong> <?= t('techLambda') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>CloudFormation:</strong> <?= t('techCF') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>Azure VMs:</strong> <?= t('techAzureVM') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>Azure Blob Storage:</strong> <?= t('techAzureBlob') ?></span></li> </ul> </div>
                 <div class="tech-category" style="border-left-color: #a78bfa;"> <h3 class="text-xl font-semibold mb-4 flex items-center" style="color: #a78bfa;"><i class="fas fa-box-open mr-3"></i><?= t('techCatContainer') ?></h3> <ul class="space-y-3 text-sm md:text-base"> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>Docker:</strong> <?= t('techDocker') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>Kubernetes (K8s):</strong> <?= t('techK8s') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>Helm:</strong> <?= t('techHelm') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>EKS:</strong> <?= t('techEKS') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>AKS:</strong> <?= t('techAKS') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>GKE:</strong> <?= t('techGKE') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>OpenShift:</strong> <?= t('techOpenShift') ?></span></li> <li class="tech-card flex items-start"><i class="fas fa-check-circle text-green-500 mr-2 mt-1"></i><span><strong>Istio:</strong> <?= t('techIstio') ?></span></li> </ul> </div>
@@ -469,16 +564,117 @@ if ($pdo) {
         </div>
     </section>
 
+    <!-- NEW DATABASE EXPERT SECTION (Kept the one you added previously here too, or we can remove it since it's now at the top. I'll leave it as detailed breakdown) -->
+    <section id="db-expertise-details" class="py-10 md:py-14 lg:py-16 bg-gradient-to-b from-gray-800 to-gray-900 px-4 sm:px-6">
+        <div class="container mx-auto">
+            <h2 class="text-3xl md:text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300">
+                <?= t('dbDetailedTitle') ?>
+            </h2>
+
+            <!-- MySQL & Clusters -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center mb-16">
+                <!-- Text -->
+                <div class="fade-in-element">
+                     <h3 class="text-xl md:text-2xl font-semibold text-white mb-4"><?= t('dbMysqlTitle') ?></h3>
+                     <p class="text-gray-300 mb-6 leading-relaxed">
+                         <?= t('dbMysqlDesc') ?>
+                     </p>
+                     <ul class="space-y-4 text-gray-400">
+                         <li class="flex items-start"><i class="fas fa-network-wired text-blue-500 mt-1 mr-3"></i><span><?= t('dbMysqlPoint1') ?></span></li>
+                         <li class="flex items-start"><i class="fas fa-random text-blue-500 mt-1 mr-3"></i><span><?= t('dbMysqlPoint2') ?></span></li>
+                         <li class="flex items-start"><i class="fas fa-clone text-blue-500 mt-1 mr-3"></i><span><?= t('dbMysqlPoint3') ?></span></li>
+                     </ul>
+                </div>
+                <!-- Visual/Image -->
+                <div class="bg-gray-800 p-2 rounded-xl shadow-2xl border border-gray-700 fade-in-element" style="animation-delay: 0.2s;">
+                    <!-- Terminal Simulation -->
+                    <div class="bg-gray-900 rounded-lg p-4 font-mono text-xs sm:text-sm text-green-400">
+                         <div class="flex items-center gap-2 mb-4 border-b border-gray-700 pb-2">
+                             <div class="w-2 h-2 rounded-full bg-red-500"></div><div class="w-2 h-2 rounded-full bg-yellow-500"></div><div class="w-2 h-2 rounded-full bg-green-500"></div>
+                             <span class="text-gray-500 ml-2">cluster_status.sh</span>
+                         </div>
+                         <p class="mb-1"><span class="text-blue-400">root@db-node-01:~#</span> mysql -e "SHOW STATUS LIKE 'wsrep%'"</p>
+                         <!-- FIX: Use <pre> tag for correct table alignment -->
+                         <pre class="leading-tight">
++---------------------------+------------+
+| Variable_name             | Value      |
++---------------------------+------------+
+| wsrep_local_state_comment | Synced     |
+| wsrep_cluster_size        | 3          |
+| wsrep_cluster_status      | Primary    |
+| wsrep_ready               | ON         |
++---------------------------+------------+
+                         </pre>
+                         <p class="text-gray-500 mt-2"># Cluster is healthy and replicating...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PostgreSQL -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center mb-16">
+                <!-- Visual/Image (Left on desktop) -->
+                <div class="order-2 lg:order-1 bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 flex justify-center items-center relative overflow-hidden fade-in-element">
+                    <i class="fas fa-database text-9xl text-gray-700 opacity-20 absolute scale-150"></i>
+                    <div class="relative z-10 text-center">
+                         <i class="fas fa-elephant text-7xl text-cyan-500 mb-4"></i>
+                         <div class="text-gray-300 font-mono text-sm">PostgreSQL Enterprise Edition</div>
+                    </div>
+                </div>
+                <!-- Text -->
+                <div class="order-1 lg:order-2 fade-in-element" style="animation-delay: 0.2s;">
+                     <h3 class="text-xl md:text-2xl font-semibold text-white mb-4"><?= t('dbPostgresTitle') ?></h3>
+                     <p class="text-gray-300 mb-6 leading-relaxed">
+                         <?= t('dbPostgresDesc') ?>
+                     </p>
+                     <ul class="space-y-4 text-gray-400">
+                         <li class="flex items-start"><i class="fas fa-shield-alt text-cyan-500 mt-1 mr-3"></i><span><?= t('dbPostgresPoint1') ?></span></li>
+                         <li class="flex items-start"><i class="fas fa-tachometer-alt text-cyan-500 mt-1 mr-3"></i><span><?= t('dbPostgresPoint2') ?></span></li>
+                         <li class="flex items-start"><i class="fas fa-server text-cyan-500 mt-1 mr-3"></i><span><?= t('dbPostgresPoint3') ?></span></li>
+                     </ul>
+                </div>
+            </div>
+
+            <!-- Service Catalog Grid -->
+            <h3 class="text-3xl md:text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300 fade-in-element"><?= t('dbServicesTitle') ?></h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-gray-800 p-6 rounded-lg border-t-4 border-red-500 hover:bg-gray-750 transition fade-in-element" style="animation-delay: 0.1s;">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-life-ring text-2xl text-red-500 mr-3"></i>
+                        <h4 class="text-lg font-bold text-white"><?= t('dbServiceDRTitle') ?></h4>
+                    </div>
+                    <p class="text-sm text-gray-400"><?= t('dbServiceDRDesc') ?></p>
+                </div>
+                 <!-- Card 2 -->
+                <div class="bg-gray-800 p-6 rounded-lg border-t-4 border-blue-500 hover:bg-gray-750 transition fade-in-element" style="animation-delay: 0.2s;">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-arrow-up text-2xl text-blue-500 mr-3"></i>
+                        <h4 class="text-lg font-bold text-white"><?= t('dbServiceUpgradeTitle') ?></h4>
+                    </div>
+                    <p class="text-sm text-gray-400"><?= t('dbServiceUpgradeDesc') ?></p>
+                </div>
+                 <!-- Card 3 -->
+                <div class="bg-gray-800 p-6 rounded-lg border-t-4 border-green-500 hover:bg-gray-750 transition fade-in-element" style="animation-delay: 0.3s;">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-wrench text-2xl text-green-500 mr-3"></i>
+                        <h4 class="text-lg font-bold text-white"><?= t('dbServiceFixTitle') ?></h4>
+                    </div>
+                    <p class="text-sm text-gray-400"><?= t('dbServiceFixDesc') ?></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section id="certifications" class="py-10 md:py-14 lg:py-16 bg-gray-900 px-4 sm:px-6 fade-in-element">
         <div class="container mx-auto">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-12 text-blue-400"><?= t('certsTitle') ?></h2>
+            <h2 class="text-3xl md:text-5xl font-bold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300"><?= t('certsTitle') ?></h2>
             <div class="max-w-3xl mx-auto"> <div class="cert-card bg-gray-800 p-5 md:p-6 rounded-lg shadow-lg border-l-4 border-yellow-500"> <h3 class="text-lg md:text-xl font-semibold mb-2 md:mb-3 text-white flex items-center"> <i class="fas fa-certificate mr-3 text-yellow-400"></i> <?= t('certITIL4Name') ?> </h3> <p class="text-sm md:text-base text-gray-400"><?= t('certITIL4Desc') ?></p> </div> </div>
         </div>
     </section>
 
     <section id="references" class="py-10 md:py-14 lg:py-16 bg-gray-900 px-4 sm:px-6 text-center fade-in-element">
          <div class="container mx-auto">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-blue-400"> <?= t('clientsTitle') ?> </h2>
+            <h2 class="text-3xl md:text-5xl font-bold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-300"> <?= t('clientsTitle') ?> </h2>
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 md:gap-8 lg:gap-10 items-center">
                 <div class="reference-logo"> <img src="/images/logos/image_065dc9.png" alt="Infineon Logo" onerror="this.onerror=null; this.src='https://placehold.co/150x50/eeeeee/aaaaaa?text=Infineon'; this.parentElement.classList.add('placeholder'); this.style.display='none'; this.parentElement.innerHTML += 'Infineon';"> </div>
                 <div class="reference-logo"> <img src="/images/logos/image_065e4c.png" alt="Bayerischer Rundfunk Logo" onerror="this.onerror=null; this.src='https://placehold.co/150x50/eeeeee/aaaaaa?text=BR'; this.parentElement.classList.add('placeholder'); this.style.display='none'; this.parentElement.innerHTML += 'BR';"> </div>
@@ -509,14 +705,18 @@ if ($pdo) {
 
     <section id="get-started" class="py-10 md:py-14 lg:py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 sm:px-6 text-center fade-in-element">
         <div class="container mx-auto max-w-3xl">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4"><?= t('contactTitle') ?></h2>
-            <p class="text-base md:text-lg lg:text-xl mb-8"><?= t('contactSubtitle') ?></p>
+            <h2 class="text-3xl md:text-5xl font-bold mb-4"><?= t('contactTitle') ?></h2>
+            <p class="text-base md:text-lg lg:text-xl mb-2"><?= t('contactSubtitle') ?></p>
+            
+            <div class="flex items-center justify-center gap-2 text-blue-200/80 text-sm mb-8">
+                <i class="fas fa-map-marker-alt"></i> <span><?= t('contactLocation') ?></span>
+            </div>
 
-            <form id="contact-form" action="/submit_contact.php" method="POST" class="text-left space-y-5">
+            <form id="contact-form" action="/send-message.php" method="POST" class="text-left space-y-5">
                  <div> <label for="name" class="block text-sm font-medium mb-1"><?= t('contactNameLabel') ?></label> <input type="text" id="name" name="name" required class="form-input"> </div>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-5"> <div> <label for="email" class="block text-sm font-medium mb-1"><?= t('contactEmailLabel') ?></label> <input type="email" id="email" name="email" required class="form-input"> </div> <div> <label for="phone" class="block text-sm font-medium mb-1"><?= t('contactPhoneLabel') ?></label> <input type="tel" id="phone" name="phone" class="form-input"> </div> </div>
                  <div> <label for="message" class="block text-sm font-medium mb-1"><?= t('contactMessageLabel') ?></label> <textarea id="message" name="message" rows="5" required class="form-input form-textarea"></textarea> </div>
-                 <div class="flex items-center space-x-2"> <input type="checkbox" id="send-copy" name="send-copy" class="form-checkbox h-4 w-4 rounded"> <label for="send-copy" class="text-sm"><?= t('contactSendCopyLabel') ?></label> </div>
+                 <div class="flex items-center space-x-2"> <input type="checkbox" id="copy_me" name="copy_me" class="form-checkbox h-4 w-4 rounded"> <label for="copy_me" class="text-sm"><?= t('contactSendCopyLabel') ?></label> </div>
                  <div class="text-center pt-4"> <button type="submit" class="bg-white hover:bg-gray-100 text-blue-600 font-semibold px-8 py-3 rounded-lg transition duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-base md:text-lg"> <?= t('contactSubmitButton') ?> </button> </div>
             </form>
             <div id="form-status" class="mt-6 text-center text-lg font-medium hidden"></div>
@@ -542,6 +742,8 @@ if ($pdo) {
             <a href="#impressum" class="hover:text-gray-300 transition duration-300 mr-4"><?= t('footerImpressum') ?></a>
             <span class="mr-4">|</span>
             <p class="inline-block">&copy; <script>document.write(new Date().getFullYear())</script> Sortia. <?= t('footerCopyright') ?></p>
+            <span class="mx-2 text-gray-700 hidden sm:inline">|</span>
+            <span class="block sm:inline text-gray-600 text-xs mt-1 sm:mt-0"><?= t('footerLocation') ?></span>
         </div>
     </footer>
 
@@ -556,6 +758,43 @@ if ($pdo) {
                 mobileLinks.forEach(link => { link.addEventListener('click', (e) => { if (link.getAttribute('href').startsWith('#')) { mobileMenu.classList.add('hidden'); } }); });
             }
 
+            // --- Scroll Spy for Active Menu Highlighting ---
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link'); // Select desktop nav links
+
+            function highlightMenu() {
+                let scrollY = window.scrollY;
+                let currentSectionId = '';
+
+                sections.forEach(current => {
+                    // Check if section is somewhat in view
+                    // Offset for sticky header & visual comfort
+                    const sectionTop = current.offsetTop - 150; 
+                    const sectionHeight = current.offsetHeight;
+                    
+                    if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+                        currentSectionId = current.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    // Reset styles for all links
+                    link.classList.remove('text-blue-400', 'font-bold');
+                    link.classList.add('text-gray-300');
+                    
+                    // Apply styles to active link
+                    if (link.getAttribute('href') === '#' + currentSectionId) {
+                        link.classList.remove('text-gray-300');
+                        link.classList.add('text-blue-400', 'font-bold');
+                    }
+                });
+            }
+
+            window.addEventListener('scroll', highlightMenu);
+            // Call once on load to set initial state
+            highlightMenu();
+
+
             // --- Contact Form Submission Handling (AJAX) ---
             const contactForm = document.getElementById('contact-form');
             const formStatus = document.getElementById('form-status');
@@ -566,20 +805,30 @@ if ($pdo) {
                     formStatus.textContent = 'Sending...';
                     formStatus.classList.add('text-yellow-400');
                     const formData = new FormData(contactForm);
-                    fetch('/submit_contact.php', { method: 'POST', body: formData })
-                    .then(response => {
-                        if (!response.ok) { return response.text().then(text => { throw new Error(`HTTP error! Status: ${response.status}. Response: ${text.substring(0, 200)}...`); }); }
-                        const contentType = response.headers.get("content-type");
-                        if (contentType && contentType.indexOf("application/json") !== -1) { return response.json(); }
-                        else { return response.text().then(text => { throw new Error(`Unexpected response type: ${contentType}. Content: ${text.substring(0,200)}...`); }); }
+                    fetch('/send-message.php', { method: 'POST', body: formData })
+                    .then(response => response.text()) // Get raw text first to handle potential HTML prefix
+                    .then(text => {
+                        // FIX: Filter out any HTML/link tags prepended by server config before parsing JSON
+                        const jsonStart = text.indexOf('{');
+                        const jsonEnd = text.lastIndexOf('}');
+                        if (jsonStart !== -1 && jsonEnd !== -1) {
+                            const jsonString = text.substring(jsonStart, jsonEnd + 1);
+                            try {
+                                return JSON.parse(jsonString);
+                            } catch (e) {
+                                throw new Error("Failed to parse JSON response: " + e.message);
+                            }
+                        }
+                        // Fallback if no valid JSON structure is found
+                        throw new Error("Invalid server response (no JSON found).");
                     })
                     .then(data => {
-                        if (data.status === 'success') {
-                            formStatus.textContent = data.message;
+                        if (data.status === 'success' || data.ok === true || data.success === true) {
+                            formStatus.textContent = data.message || "Message sent successfully!";
                             formStatus.classList.remove('text-yellow-400', 'text-red-400'); formStatus.classList.add('text-green-400');
                             contactForm.reset();
                         } else {
-                            formStatus.textContent = data.message || 'An error occurred. Please try again.';
+                            formStatus.textContent = data.message || data.error || 'An error occurred. Please try again.';
                             formStatus.classList.remove('text-yellow-400', 'text-green-400'); formStatus.classList.add('text-red-400');
                         }
                     })
